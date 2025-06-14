@@ -21,13 +21,8 @@ var (
 var testBotCmd = &cobra.Command{
 	Use:     "testBot",
 	Aliases: []string{"start"},
-	Short:   "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short:   "My simpler test bot",
+	Long:    `A longer description. `,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("testBot %s started", appVersion)
 
@@ -49,7 +44,7 @@ to quickly create a Cobra application.`,
 				currentDay := time.Now().Weekday().String()
 				err = m.Send(fmt.Sprintf("Today is %s", currentDay))
 			default:
-				err = m.Send("I don't understand this command. Try /hello or /day")
+				err = m.Send("I don't understand this command. Try '/start hello' or '/start day'")
 			}
 			return err
 		})
@@ -62,13 +57,4 @@ to quickly create a Cobra application.`,
 func init() {
 	rootCmd.AddCommand(testBotCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// testBotCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// testBotCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

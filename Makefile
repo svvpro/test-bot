@@ -3,6 +3,32 @@ GIT_REPO="github.com/svvpro/test-bot"
 REGYSTRY=svvpro
 VERSION=$(shell git describe --tags --abbrev=0)-$(shell git rev-parse --short HEAD)
 
+#Detect OS ARCHITECTURE
+OS := $(strip $(shell uname -s))
+ARCH := $(strip $(shell uname -m))
+
+ifeq ($(OS),Linux)
+  DOCKER_OS := linux
+else ifeq ($(OS),Darwin)
+  DOCKER_OS := linux
+else ifeq ($(findstring MINGW,$(OS)),MINGW)
+  DOCKER_OS := windows
+else
+  $(error Unsupported OS: $(OS))
+endif
+
+ifeq ($(ARCH),x86_64)
+  DOCKER_ARCH := amd64
+else ifeq ($(ARCH),arm64)
+  DOCKER_ARCH := arm64
+else ifeq ($(ARCH),aarch64)
+  DOCKER_ARCH := arm64
+else
+  $(error Unsupported architecture: $(ARCH))
+endif
+
+PLATFORM := $(DOCKER_OS)/$(DOCKER_ARCH)
+
 
 format:
 	gofmt -s -w ./
@@ -33,15 +59,13 @@ windows: format get
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -v -o=${APP_NAME}.exe -ldflags "-X="${GIT_REPO}/cmd.appVersion=${VERSION}
 
 image:
-	docker buildx build \
-	--platform linux/amd64,linux/arm64,windows/amd64,darwin/arm64 \
+	docker build \
+	--platform $(PLATFORM) \
 	--build-arg APP_NAME=${APP_NAME} \
 	--build-arg VERSION=${VERSION} \
 	--build-arg GIT_REPO=${GIT_REPO} \
 	-t ghcr.io/${REGYSTRY}/${APP_NAME}:${VERSION} \
-	--push \
     .
-	docker pull ghcr.io/${REGYSTRY}/${APP_NAME}:${VERSION}
 
 clean:
-	docker rmi ghcr.io/${REGYSTRY}/${APP_NAME}:${VERSION}
+	docker rmi --force ghcr.io/${REGYSTRY}/${APP_NAME}:${VERSION}

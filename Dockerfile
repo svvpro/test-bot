@@ -10,7 +10,9 @@ WORKDIR /go/src/app
 COPY . .
 RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -v -o=${APP_NAME} -ldflags "-X=${GIT_REPO}/cmd.appVersion=${VERSION}"
 
-FROM scratch
+FROM alpine:latest
+RUN apk --no-cache add ca-certificates
 ARG APP_NAME
 COPY --from=builder "/go/src/app/${APP_NAME}" /app
+ENV TELE_TOKEN=""
 ENTRYPOINT [ "/app" ]

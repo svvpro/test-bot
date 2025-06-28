@@ -64,8 +64,11 @@ image:
 	--build-arg APP_NAME=${APP_NAME} \
 	--build-arg VERSION=${VERSION} \
 	--build-arg GIT_REPO=${GIT_REPO} \
-	-t ghcr.io/${REGYSTRY}/${APP_NAME}:${VERSION} \
+	-t ghcr.io/${REGYSTRY}/${APP_NAME}:${VERSION}-${DOCKER_OS}-${DOCKER_ARCH} \
     .
+
+push:
+	docker push ghcr.io/${REGYSTRY}/${APP_NAME}:${VERSION}-${DOCKER_OS}-${DOCKER_ARCH} 
 
 clean:
 	docker rmi --force ghcr.io/${REGYSTRY}/${APP_NAME}:${VERSION}
